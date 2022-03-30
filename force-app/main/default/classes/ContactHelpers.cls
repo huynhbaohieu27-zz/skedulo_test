@@ -24,15 +24,15 @@ public with sharing class ContactHelpers {
     /*
     * Update Total_Contacts__c when update contact
     */
-    public static void updateContact(List<Contact> listContacts) {
+    public static void updateContact(List<Contact> listContacts, Map<Id, Contact> mapOldContact) {
         for (Contact c: listContacts) {
             if (!String.isBlank(c.AccountId)) {
-                if (c.Active__c) {
+                if (c.Active__c && mapOldContact.get(c.Id).Active__c != c.Active__c) {
                     Account a = [SELECT Id, Total_Contacts__c FROM Account WHERE Id = :c.AccountId];
                     a.Total_Contacts__c += 1;
     
                     update a;
-                } else {
+                } else if (mapOldContact.get(c.Id).Counter__c == c.Counter__c) {
                     submitApprovalProcess(c);
                 }
             }
